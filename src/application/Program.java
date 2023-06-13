@@ -35,6 +35,15 @@ public class Program {
                 if(capturPiece != null){
                     captured.add(capturPiece);
                 }
+                if(chessMatch.getPrometed() != null){
+                    System.out.print("Enter piece for prometed (B/N/R/Q)");
+                    String type = sc.nextLine().toUpperCase();
+                    while(!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")){
+                        System.out.print("Invalid value! Enter piece for prometed (B/N/R/Q)");
+                        type = sc.nextLine().toUpperCase();
+                    }
+                    chessMatch.replacePrometedPiece(type);
+                }
             }
             catch(ChessException e){
                 System.out.print(e.getMessage());

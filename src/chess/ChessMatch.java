@@ -21,6 +21,7 @@ public class ChessMatch {
     private boolean check;
     private boolean checkMate;
     private ChessPiece enPassantVulnerable;
+    private ChessPiece prometed;
 
    
 
@@ -41,6 +42,9 @@ public class ChessMatch {
     }
     public ChessPiece getEnPassantVulnerable(){
         return enPassantVulnerable;
+    }
+    public ChessPiece getPrometed(){
+        return prometed;
     }
     public ChessMatch(){
         board = new Board(8,8);
@@ -77,6 +81,15 @@ public class ChessMatch {
 
         ChessPiece movedPiece = (ChessPiece)board.piece(target);
 
+        prometed = null;
+        if(movedPiece instanceof Pawn){
+            if(movedPiece.getColor() == Color.WHITE && target.getRow() == 0 || movedPiece.getColor() == Color.BLACK && target.getRow() == 7){
+                prometed = (ChessPiece)board.piece(target);
+                prometed = replacePrometedPiece("Q");
+            }
+        }
+
+
         check = (testCheck(opponent(currentPlayer))) ? true : false;
         if(testCheckMate(currentPlayer)){
             checkMate = true;
@@ -95,6 +108,31 @@ public class ChessMatch {
         return (ChessPiece)capturePiece;
         
     }
+    public ChessPiece replacePrometedPiece(String type){
+        if(prometed == null){
+            throw new IllegalStateException("There is no piece to be prometed");
+        }
+        if(!type.equals("B") && !type.equals("N") && !type.equals("R") && !type.equals("Q")){
+            return prometed;
+        }
+        Position pos = prometed.getChessPosition().toPosition();
+        Piece p = board.removePiece(pos);
+        piecesOnTheBoard.remove(p);
+
+        ChessPiece newPiece = newPiece(type, prometed.getColor());
+        board.placePiece(newPiece, pos);
+        piecesOnTheBoard.add(newPiece);
+        
+        return newPiece;
+    }
+
+    private ChessPiece newPiece(String type, Color color){
+        if(type.equals("B")) return new Bishop(board, color);
+        if(type.equals("N")) return new knight(board, color);
+        if(type.equals("R")) return new Rook(board, color);
+        return new Queen(board, color);
+    }
+
     private Piece makeMove(Position source, Position target){
         ChessPiece p= (ChessPiece)board.removePiece(source);
         p.increaseMoveCount();
